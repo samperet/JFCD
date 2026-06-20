@@ -571,6 +571,69 @@ textarea {
   padding: 4px 24px 24px;
 }
 
+/* Register / add-user row + inline form (shared: login list and sheets) */
+.add-user-row,
+.add-user-form {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 11px 16px;
+}
+.add-user-row {
+  text-align: left;
+  color: var(--blue);
+  font-size: 17px;
+  font-weight: 500;
+  transition: background 0.12s;
+}
+.add-user-row:active { background: var(--fill); }
+.add-user-plus {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--fill);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 300;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.add-user-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 17px;
+  color: var(--label);
+  padding: 6px 0;
+}
+.add-user-input::placeholder { color: var(--label-muted); }
+.add-user-join {
+  color: #fff;
+  background: var(--blue);
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.add-user-join:active { transform: scale(0.94); }
+.add-user-join:disabled { opacity: 0.4; }
+
+/* Inside a sheet, separate the add row from the member list above it */
+.sheet-body .add-user-row,
+.sheet-body .add-user-form {
+  border-top: 0.5px solid var(--separator);
+  padding-left: 0;
+  padding-right: 0;
+}
+
 /* ============================================================
    Sheets (switch user, avatar picker)
    ============================================================ */

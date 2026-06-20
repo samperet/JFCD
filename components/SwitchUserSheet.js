@@ -1,8 +1,8 @@
 'use client';
 
 import { useStore } from '@/lib/store';
-import { USERS } from '@/lib/users';
 import Sheet from './Sheet';
+import AddUserForm from './AddUserForm';
 
 function Check() {
   return (
@@ -13,7 +13,7 @@ function Check() {
 }
 
 export default function SwitchUserSheet({ open, onClose }) {
-  const { currentUser, login, avatarFor, notify, enableNotifications } = useStore();
+  const { currentUser, roster, login, avatarFor, notify, enableNotifications } = useStore();
 
   const pick = (id) => {
     if (id !== currentUser) login(id);
@@ -21,20 +21,22 @@ export default function SwitchUserSheet({ open, onClose }) {
   };
 
   return (
-    <Sheet open={open} onClose={onClose} title="Switch User">
-      {USERS.map((u) => (
-        <button key={u.id} className="member" onClick={() => pick(u.id)}>
-          <img src={avatarFor(u.id)} alt="" />
+    <Sheet open={open} onClose={onClose} title="Accounts">
+      {roster.map((u) => (
+        <button key={u.name} className="member" onClick={() => pick(u.name)}>
+          <img src={avatarFor(u.name)} alt="" />
           <span className="member-name">{u.name}</span>
-          {u.id === currentUser && <Check />}
+          {u.name === currentUser && <Check />}
         </button>
       ))}
+
+      <AddUserForm onAdded={onClose} label="Add person" placeholder="Type a name…" />
+
 
       <button
         className="member"
         onClick={enableNotifications}
         aria-label={notify ? 'Notifications enabled' : 'Enable notifications'}
-        style={{ borderTop: '0.5px solid var(--separator)', marginTop: 6 }}
       >
         <span aria-hidden="true" style={{ fontSize: 22, width: 44, textAlign: 'center' }}>
           {notify ? '🔔' : '🔕'}
