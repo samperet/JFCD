@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(curl -s http://localhost:8000/app.js)",
+      "Bash(curl -s http://localhost:8000/manifest.json)",
+      "Bash(node -c app.js)",
+      "Bash(grep -E '\\\\.\\(js|json|css|html|md|gitignore\\)$')",
+      "Bash(curl -s http://localhost:8000)",
+      "Bash(git config *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure chat application">
+    <meta name="theme-color" content="#6366f1">
+    <title>ChatHub</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='120' dominant-baseline='middle' text-anchor='middle' fill='white'>💬</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="app-icon">💬</div>
+                <h1>ChatHub</h1>
+                <p>Select your name to continue</p>
+            </div>
+            <div class="user-grid">
+                <button class="user-btn" data-user="Jaya">
+                    <span class="user-avatar">🎨</span>
+                    <span class="user-name">Jaya</span>
+                </button>
+                <button class="user-btn" data-user="Fiona">
+                    <span class="user-avatar">🎭</span>
+                    <span class="user-name">Fiona</span>
+                </button>
+                <button class="user-btn" data-user="Lucy">
+                    <span class="user-avatar">🌟</span>
+                    <span class="user-name">Lucy</span>
+                </button>
+                <button class="user-btn" data-user="Cece">
+                    <span class="user-avatar">🚀</span>
+                    <span class="user-name">Cece</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chatScreen" class="screen">
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-left">
+                    <button class="logout-btn" title="Switch user">👤</button>
+                    <button class="notifications-btn" title="Enable notifications" id="notificationsBtn">🔔</button>
+                </div>
+                <div class="header-center">
+                    <h1>ChatHub</h1>
+                </div>
+                <div class="header-right">
+                    <button class="avatar-btn" title="Change avatar">✨</button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <p>Welcome! Start chatting...</p>
+                </div>
+            </div>
+
+            <!-- User Info Bar -->
+            <div class="user-info-bar">
+                <div class="current-user">
+                    <span class="user-avatar-small" id="currentUserAvatar">🎨</span>
+                    <span class="user-name-display" id="currentUserName">Jaya</span>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-container">
+                <form id="messageForm" class="message-form">
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="Type a message..."
+                        autocomplete="off"
+                        maxlength="500"
+                    >
+                    <button type="submit" class="send-btn" title="Send message">📤</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avatar Picker Modal -->
+    <div id="avatarModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Choose Your Avatar</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="avatar-grid">
+                <button class="avatar-option" data-avatar="🎨">🎨</button>
+                <button class="avatar-option" data-avatar="🎭">🎭</button>
+                <button class="avatar-option" data-avatar="🌟">🌟</button>
+                <button class="avatar-option" data-avatar="🚀">🚀</button>
+                <button class="avatar-option" data-avatar="🎪">🎪</button>
+                <button class="avatar-option" data-avatar="🎮">🎮</button>
+                <button class="avatar-option" data-avatar="🎸">🎸</button>
+                <button class="avatar-option" data-avatar="🎲">🎲</button>
+                <button class="avatar-option" data-avatar="🍕">🍕</button>
+                <button class="avatar-option" data-avatar="🐱">🐱</button>
+                <button class="avatar-option" data-avatar="🐶">🐶</button>
+                <button class="avatar-option" data-avatar="🦊">🦊</button>
+                <button class="avatar-option" data-avatar="🦋">🦋</button>
+                <button class="avatar-option" data-avatar="🌈">🌈</button>
+                <button class="avatar-option" data-avatar="⚡">⚡</button>
+                <button class="avatar-option" data-avatar="💎">💎</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

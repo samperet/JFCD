@@ -1,0 +1,24 @@
+{
+  "name": "chathub",
+  "version": "1.0.0",
+  "description": "A secure, fun chat PWA with offline support and notifications",
+  "author": "Claude Code",
+  "license": "MIT",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "start": "python3 -m http.server 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/chathub.git"
+  },
+  "keywords": [
+    "chat",
+    "pwa",
+    "progressive-web-app",
+    "notifications",
+    "offline",
+    "vanilla-js"
+  ]
+}
