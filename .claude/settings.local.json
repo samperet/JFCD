@@ -16,7 +16,19 @@
       "Bash(git branch *)",
       "Bash(git push *)",
       "Bash(npx plugins *)",
-      "Bash(ls -la ~/.claude/plugins/ 2>/dev/null || echo \"Plugins directory check\" && npx plugins list 2>&1 | head -20)"
+      "Bash(ls -la ~/.claude/plugins/ 2>/dev/null || echo \"Plugins directory check\" && npx plugins list 2>&1 | head -20)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm audit *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000 -o /tmp/jfcd-home.html -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill -9)",
+      "Bash(echo \"port 3000 free: $\\(lsof -ti:3000)"
     ]
   }
 }
