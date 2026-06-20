@@ -11,7 +11,8 @@ const app = {
     db: null,
     sw: null,
     notificationsEnabled: false,
-    unreadCount: 0
+    unreadCount: 0,
+    menuOpen: false
 };
 
 // DOM Elements
@@ -20,19 +21,25 @@ const chatScreen = document.getElementById('chatScreen');
 const messagesContainer = document.getElementById('messagesContainer');
 const messageInput = document.getElementById('messageInput');
 const messageForm = document.getElementById('messageForm');
-const logoutBtn = document.querySelector('.logout-btn');
+const menuBtn = document.getElementById('menuBtn');
+const hamburgerMenu = document.getElementById('hamburgerMenu');
+const closeMenuBtn = document.getElementById('closeMenuBtn');
+const menuBackdrop = document.querySelector('.menu-backdrop');
 const avatarBtn = document.querySelector('.avatar-btn');
 const avatarModal = document.getElementById('avatarModal');
 const closeBtn = document.querySelector('.close-btn');
 const currentUserAvatar = document.getElementById('currentUserAvatar');
 const currentUserName = document.getElementById('currentUserName');
+const notificationBadge = document.getElementById('notificationBadge');
 const userBtns = document.querySelectorAll('.user-btn');
 const avatarOptions = document.querySelectorAll('.avatar-option');
+const menuUserItems = document.querySelectorAll('.menu-user-item');
+const menuNotificationsBtn = document.getElementById('menuNotificationsBtn');
 
 // Initialize IndexedDB
 async function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('ChatDB', 1);
+        const request = indexedDB.open('JFCDDB', 1);
 
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
@@ -142,14 +149,13 @@ async function sendNotification(title, options = {}) {
     if (!app.notificationsEnabled || !app.sw) return;
 
     try {
-        // Use service worker to send notification
         app.sw.controller.postMessage({
             type: 'SHOW_NOTIFICATION',
             title: title,
             options: {
-                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%236366f1" width="192" height="192"/><text x="50%" y="50%" font-size="120" dominant-baseline="middle" text-anchor="middle" fill="white">💬</text></svg>',
-                badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%236366f1" width="192" height="192"/><text x="50%" y="50%" font-size="120" dominant-baseline="middle" text-anchor="middle" fill="white">💬</text></svg>',
-                tag: 'chathub-message',
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%23007AFF" width="192" height="192" rx="40"/><text x="50%" y="50%" font-size="100" font-weight="bold" dominant-baseline="middle" text-anchor="middle" fill="white">J</text></svg>',
+                badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%23007AFF" width="192" height="192" rx="40"/><text x="50%" y="50%" font-size="100" font-weight="bold" dominant-baseline="middle" text-anchor="middle" fill="white">J</text></svg>',
+                tag: 'jfcd-message',
                 requireInteraction: false,
                 ...options
             }
@@ -164,11 +170,13 @@ function updateUnreadCount() {
     const unreadMessages = app.messages.filter(msg => msg.sender !== app.currentUser);
     app.unreadCount = unreadMessages.length;
 
-    // Update document title
     if (app.unreadCount > 0) {
-        document.title = `ChatHub (${app.unreadCount})`;
+        document.title = `JFCD (${app.unreadCount})`;
+        notificationBadge.textContent = app.unreadCount;
+        notificationBadge.style.display = 'inline-block';
     } else {
-        document.title = 'ChatHub';
+        document.title = 'JFCD';
+        notificationBadge.style.display = 'none';
     }
 }
 
@@ -181,28 +189,30 @@ function formatTime(date) {
 
 // Display messages
 async function renderMessages() {
-    // Clear container but keep welcome message if no messages
     if (app.messages.length === 0) {
-        messagesContainer.innerHTML = '<div class="welcome-message"><p>Welcome! Start chatting...</p></div>';
+        messagesContainer.innerHTML = '<div class="welcome-message"><p>No messages yet</p></div>';
         return;
     }
 
     messagesContainer.innerHTML = '';
 
-    app.messages.forEach(msg => {
+    app.messages.forEach((msg, index) => {
         const messageEl = document.createElement('div');
         messageEl.className = `message ${msg.sender === app.currentUser ? 'own' : ''}`;
 
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.textContent = app.users[msg.sender].avatar;
+        const messageGroup = document.createElement('div');
+        messageGroup.className = 'message-group';
 
-        const content = document.createElement('div');
-        content.className = 'message-content';
+        // Show avatar and name for first message or when sender changes
+        const showSenderInfo = msg.sender !== app.currentUser &&
+            (index === 0 || app.messages[index - 1].sender !== msg.sender);
 
-        const sender = document.createElement('div');
-        sender.className = 'message-sender';
-        sender.textContent = msg.sender;
+        if (msg.sender !== app.currentUser) {
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = app.users[msg.sender].avatar;
+            messageEl.appendChild(avatar);
+        }
 
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
@@ -212,17 +222,13 @@ async function renderMessages() {
         time.className = 'message-time';
         time.textContent = formatTime(new Date(msg.timestamp));
 
-        content.appendChild(sender);
-        content.appendChild(bubble);
-        content.appendChild(time);
+        messageGroup.appendChild(bubble);
+        messageGroup.appendChild(time);
 
-        messageEl.appendChild(avatar);
-        messageEl.appendChild(content);
-
+        messageEl.appendChild(messageGroup);
         messagesContainer.appendChild(messageEl);
     });
 
-    // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     updateUnreadCount();
 }
@@ -240,24 +246,19 @@ async function sendMessage(e) {
         timestamp: new Date().toISOString()
     };
 
-    // Save to DB
     await saveMessage(message);
     app.messages.push(message);
 
-    // Simulate receiving messages from other users (for demo)
-    // In production, this would come from a server
+    // Simulate other users responding
     simulateOtherUserMessages();
 
-    // Clear input and render
     messageInput.value = '';
     await renderMessages();
-    updateUnreadCount();
     messageInput.focus();
 }
 
-// Simulate other users sending messages (demo only)
+// Simulate other users sending messages (demo)
 function simulateOtherUserMessages() {
-    // 30% chance another user responds
     if (Math.random() > 0.7) {
         const otherUsers = Object.keys(app.users).filter(name => name !== app.currentUser);
         const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)];
@@ -275,7 +276,6 @@ function simulateOtherUserMessages() {
 
         const randomResponse = responses[Math.floor(Math.random() * responses.length)];
 
-        // Simulate slight delay
         setTimeout(async () => {
             const message = {
                 sender: randomUser,
@@ -286,9 +286,7 @@ function simulateOtherUserMessages() {
             await saveMessage(message);
             app.messages.push(message);
             await renderMessages();
-            updateUnreadCount();
 
-            // Send notification if window not focused
             if (!document.hasFocus()) {
                 const senderAvatar = app.users[randomUser].avatar;
                 await sendNotification(`${randomUser} ${senderAvatar}`, {
@@ -307,25 +305,21 @@ async function loginUser(userName) {
     currentUserName.textContent = userName;
     currentUserAvatar.textContent = app.users[userName].avatar;
 
-    // Save to session storage
     sessionStorage.setItem('currentUser', userName);
 
-    // Load messages
     await loadMessages();
     await renderMessages();
 
-    // Check notification permission status
     if (Notification.permission === 'granted') {
         app.notificationsEnabled = true;
     }
     updateNotificationButton();
+    updateMenuUserSelection();
 
-    // Switch screens
     loginScreen.classList.remove('active');
     chatScreen.classList.add('active');
     messageInput.focus();
 
-    // Reset unread count when user is active
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             updateUnreadCount();
@@ -333,30 +327,59 @@ async function loginUser(userName) {
     });
 }
 
-// Logout
+// Logout / Switch user
 function logout() {
     app.currentUser = null;
     app.unreadCount = 0;
-    document.title = 'ChatHub';
+    document.title = 'JFCD';
     sessionStorage.removeItem('currentUser');
     messageInput.value = '';
+    closeMenu();
     loginScreen.classList.add('active');
     chatScreen.classList.remove('active');
-    messagesContainer.innerHTML = '<div class="welcome-message"><p>Welcome! Start chatting...</p></div>';
+    messagesContainer.innerHTML = '<div class="welcome-message"><p>No messages yet</p></div>';
 }
 
-// Open avatar picker
+// Hamburger Menu
+function openMenu() {
+    hamburgerMenu.classList.add('active');
+    app.menuOpen = true;
+}
+
+function closeMenu() {
+    hamburgerMenu.classList.remove('active');
+    app.menuOpen = false;
+}
+
+function toggleMenu() {
+    if (app.menuOpen) {
+        closeMenu();
+    } else {
+        openMenu();
+    }
+}
+
+function updateMenuUserSelection() {
+    menuUserItems.forEach(item => {
+        const user = item.dataset.user;
+        if (user === app.currentUser) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+// Avatar Management
 function openAvatarPicker() {
     avatarModal.classList.add('active');
     updateAvatarSelection();
 }
 
-// Close avatar picker
 function closeAvatarPicker() {
     avatarModal.classList.remove('active');
 }
 
-// Update avatar selection UI
 function updateAvatarSelection() {
     const currentAvatar = app.users[app.currentUser].avatar;
     avatarOptions.forEach(option => {
@@ -368,7 +391,6 @@ function updateAvatarSelection() {
     });
 }
 
-// Change avatar
 async function changeAvatar(newAvatar) {
     app.users[app.currentUser].avatar = newAvatar;
     currentUserAvatar.textContent = newAvatar;
@@ -377,9 +399,22 @@ async function changeAvatar(newAvatar) {
     await renderMessages();
 }
 
-// Event Listeners
+// Notifications
+function updateNotificationButton() {
+    const status = document.getElementById('notificationStatus');
+    if (app.notificationsEnabled) {
+        status.textContent = '🔔 Notifications Enabled';
+    } else if (Notification.permission === 'denied') {
+        status.textContent = '🔕 Notifications Blocked';
+    } else {
+        status.textContent = '🔔 Enable Notifications';
+    }
+}
+
+// Event Listeners - Form
 messageForm.addEventListener('submit', sendMessage);
 
+// Event Listeners - Login
 userBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const userName = btn.dataset.user;
@@ -387,49 +422,39 @@ userBtns.forEach(btn => {
     });
 });
 
-logoutBtn.addEventListener('click', logout);
-avatarBtn.addEventListener('click', openAvatarPicker);
-closeBtn.addEventListener('click', closeAvatarPicker);
+// Event Listeners - Menu
+menuBtn.addEventListener('click', toggleMenu);
+closeMenuBtn.addEventListener('click', closeMenu);
+menuBackdrop.addEventListener('click', closeMenu);
 
-// Notification button
-const notificationsBtn = document.getElementById('notificationsBtn');
-notificationsBtn.addEventListener('click', async () => {
+menuUserItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const user = item.dataset.user;
+        if (user !== app.currentUser) {
+            loginUser(user);
+        }
+    });
+});
+
+menuNotificationsBtn.addEventListener('click', async () => {
     if (app.notificationsEnabled) {
-        // Already enabled
         alert('Notifications are already enabled!');
-        return;
-    }
-
-    notificationsBtn.classList.add('requesting');
-    const granted = await requestNotificationPermission();
-    notificationsBtn.classList.remove('requesting');
-
-    if (granted) {
-        notificationsBtn.classList.add('enabled');
-        await sendNotification('Notifications Enabled! 🎉', {
-            body: 'You\'ll now get alerts for new messages.'
-        });
     } else {
-        alert('Notification permission was denied.');
+        const granted = await requestNotificationPermission();
+        if (granted) {
+            updateNotificationButton();
+            await sendNotification('Notifications Enabled! 🎉', {
+                body: 'You\'ll now get alerts for new messages.'
+            });
+        } else {
+            alert('Notification permission was denied.');
+        }
     }
 });
 
-// Update notification button state
-function updateNotificationButton() {
-    if (app.notificationsEnabled) {
-        notificationsBtn.classList.add('enabled');
-        notificationsBtn.classList.remove('disabled');
-        notificationsBtn.title = 'Notifications enabled ✓';
-    } else {
-        notificationsBtn.classList.remove('enabled');
-        if (Notification.permission === 'denied') {
-            notificationsBtn.classList.add('disabled');
-            notificationsBtn.title = 'Notifications blocked (change in browser settings)';
-        } else {
-            notificationsBtn.title = 'Click to enable notifications';
-        }
-    }
-}
+// Event Listeners - Avatar
+avatarBtn.addEventListener('click', openAvatarPicker);
+closeBtn.addEventListener('click', closeAvatarPicker);
 
 avatarOptions.forEach(option => {
     option.addEventListener('click', () => {
@@ -437,16 +462,11 @@ avatarOptions.forEach(option => {
     });
 });
 
-// Close modal on background click
+// Modal backdrop click
 avatarModal.addEventListener('click', (e) => {
     if (e.target === avatarModal) {
         closeAvatarPicker();
     }
-});
-
-// Prevent modal close on content click
-document.querySelector('.modal-content')?.addEventListener('click', (e) => {
-    e.stopPropagation();
 });
 
 // Initialize
@@ -454,14 +474,13 @@ document.querySelector('.modal-content')?.addEventListener('click', (e) => {
     await initDB();
     await loadUserAvatars();
 
-    // Check if user was logged in
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
         await loginUser(savedUser);
     }
 })();
 
-// Register service worker for PWA
+// Register service worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
         .then(registration => {
@@ -472,7 +491,6 @@ if ('serviceWorker' in navigator) {
             console.log('Service Worker registration failed:', err);
         });
 
-    // Listen for messages from service worker
     navigator.serviceWorker.addEventListener('message', event => {
         if (event.data.type === 'NOTIFICATION_CLICKED') {
             window.focus();

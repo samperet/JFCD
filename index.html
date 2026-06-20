@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure chat application">
-    <meta name="theme-color" content="#6366f1">
-    <title>ChatHub</title>
+    <meta name="description" content="JFCD - Secure group chat application">
+    <meta name="theme-color" content="#007AFF">
+    <title>JFCD</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='120' dominant-baseline='middle' text-anchor='middle' fill='white'>💬</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23007AFF' width='192' height='192' rx='40'/><text x='50%' y='50%' font-size='100' font-weight='bold' dominant-baseline='middle' text-anchor='middle' fill='white'>J</text></svg>">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,9 +15,9 @@
     <div id="loginScreen" class="screen active">
         <div class="login-container">
             <div class="login-header">
-                <div class="app-icon">💬</div>
-                <h1>ChatHub</h1>
-                <p>Select your name to continue</p>
+                <div class="app-icon">J</div>
+                <h1>JFCD</h1>
+                <p>Select a name to start</p>
             </div>
             <div class="user-grid">
                 <button class="user-btn" data-user="Jaya">
@@ -40,50 +40,95 @@
         </div>
     </div>
 
-    <!-- Chat Screen -->
+    <!-- Chat Screen - Apple Messages Style -->
     <div id="chatScreen" class="screen">
-        <div class="chat-container">
+        <div class="chat-wrapper">
             <!-- Header -->
-            <div class="chat-header">
+            <div class="messages-header">
                 <div class="header-left">
-                    <button class="logout-btn" title="Switch user">👤</button>
-                    <button class="notifications-btn" title="Enable notifications" id="notificationsBtn">🔔</button>
+                    <button class="menu-btn" id="menuBtn" title="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
                 <div class="header-center">
-                    <h1>ChatHub</h1>
+                    <h1>JFCD</h1>
                 </div>
                 <div class="header-right">
                     <button class="avatar-btn" title="Change avatar">✨</button>
                 </div>
             </div>
 
-            <!-- Messages -->
+            <!-- Messages Container -->
             <div class="messages-container" id="messagesContainer">
                 <div class="welcome-message">
-                    <p>Welcome! Start chatting...</p>
-                </div>
-            </div>
-
-            <!-- User Info Bar -->
-            <div class="user-info-bar">
-                <div class="current-user">
-                    <span class="user-avatar-small" id="currentUserAvatar">🎨</span>
-                    <span class="user-name-display" id="currentUserName">Jaya</span>
+                    <p>No messages yet</p>
                 </div>
             </div>
 
             <!-- Message Input -->
-            <div class="message-input-container">
+            <div class="message-input-area">
                 <form id="messageForm" class="message-form">
                     <input
                         type="text"
                         id="messageInput"
-                        placeholder="Type a message..."
+                        placeholder="iMessage"
                         autocomplete="off"
                         maxlength="500"
                     >
-                    <button type="submit" class="send-btn" title="Send message">📤</button>
+                    <button type="submit" class="send-btn" title="Send">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M2 10L18 2L10 18L2 10Z" fill="currentColor"/>
+                        </svg>
+                    </button>
                 </form>
+            </div>
+
+            <!-- Current User Info Bar -->
+            <div class="user-info-bar">
+                <span class="user-avatar-small" id="currentUserAvatar">🎨</span>
+                <span class="user-name-display" id="currentUserName">Jaya</span>
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hamburger Menu -->
+    <div id="hamburgerMenu" class="hamburger-menu">
+        <div class="menu-backdrop"></div>
+        <div class="menu-content">
+            <div class="menu-header">
+                <h2>Switch User</h2>
+                <button class="close-menu-btn" id="closeMenuBtn">&times;</button>
+            </div>
+            <div class="menu-users">
+                <button class="menu-user-item" data-user="Jaya">
+                    <span class="user-avatar">🎨</span>
+                    <span>Jaya</span>
+                    <span class="checkmark" id="check-Jaya">✓</span>
+                </button>
+                <button class="menu-user-item" data-user="Fiona">
+                    <span class="user-avatar">🎭</span>
+                    <span>Fiona</span>
+                    <span class="checkmark" id="check-Fiona">✓</span>
+                </button>
+                <button class="menu-user-item" data-user="Lucy">
+                    <span class="user-avatar">🌟</span>
+                    <span>Lucy</span>
+                    <span class="checkmark" id="check-Lucy">✓</span>
+                </button>
+                <button class="menu-user-item" data-user="Cece">
+                    <span class="user-avatar">🚀</span>
+                    <span>Cece</span>
+                    <span class="checkmark" id="check-Cece">✓</span>
+                </button>
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-settings">
+                <button class="menu-notifications-btn" id="menuNotificationsBtn">
+                    <span id="notificationStatus">🔔 Enable Notifications</span>
+                </button>
             </div>
         </div>
     </div>
@@ -92,7 +137,7 @@
     <div id="avatarModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Choose Your Avatar</h2>
+                <h2>Choose Avatar</h2>
                 <button class="close-btn">&times;</button>
             </div>
             <div class="avatar-grid">
