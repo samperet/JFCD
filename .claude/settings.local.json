@@ -28,7 +28,11 @@
       "Bash(pkill -f \"next-server\")",
       "Bash(lsof -ti:3000)",
       "Bash(xargs kill -9)",
-      "Bash(echo \"port 3000 free: $\\(lsof -ti:3000)"
+      "Bash(echo \"port 3000 free: $\\(lsof -ti:3000)",
+      "Bash(npm list *)",
+      "Bash(cat > *)",
+      "Bash(echo \"cleared .next, port 3000 listeners: $\\(lsof -ti:3000)",
+      "Bash(curl -s http://localhost:3000 -o /dev/null -w \"HTTP %{http_code}\\\\n\")"
     ]
   }
 }

@@ -21,6 +21,7 @@ export default function Composer() {
     setText('');
     if (ref.current) {
       ref.current.style.height = 'auto';
+      autoGrow(ref.current);
       ref.current.focus();
     }
   };
@@ -35,7 +36,7 @@ export default function Composer() {
   return (
     <form className="composer" onSubmit={submit}>
       <button type="button" className="composer-plus" aria-label="Add attachment">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
@@ -56,7 +57,7 @@ export default function Composer() {
       </div>
 
       <button type="submit" className="composer-send" disabled={!text.trim()} aria-label="Send">
-        <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M10 16V5M5 9l5-5 5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>

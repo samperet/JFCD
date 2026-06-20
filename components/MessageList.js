@@ -5,16 +5,28 @@ import { useStore } from '@/lib/store';
 import MessageRow from './MessageRow';
 import TypingRow from './TypingRow';
 
-function dayLabel(ts) {
+function startOfDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function stampParts(ts) {
   const d = new Date(ts);
-  const today = new Date();
-  const sameDay = d.toDateString() === today.toDateString();
+  const now = new Date();
   const time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  if (sameDay) return { day: 'Today', time };
-  return {
-    day: d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
-    time,
-  };
+  const diffDays = Math.round((startOfDay(now) - startOfDay(d)) / 86400000);
+
+  let day;
+  if (diffDays === 0) day = 'Today';
+  else if (diffDays === 1) day = 'Yesterday';
+  else if (diffDays > 1 && diffDays < 7) day = d.toLocaleDateString([], { weekday: 'long' });
+  else
+    day = d.toLocaleDateString([], {
+      month: 'short',
+      day: 'numeric',
+      ...(d.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+    });
+
+  return { day, time, dayKey: d.toDateString() };
 }
 
 export default function MessageList() {
@@ -28,6 +40,7 @@ export default function MessageList() {
   }, [messages.length, typing]);
 
   let lastStampAt = 0;
+  let lastStampDay = null;
 
   return (
     <div className="thread" ref={scrollRef}>
@@ -38,16 +51,23 @@ export default function MessageList() {
         const groupEnd = !next || next.sender !== m.sender || next.ts - m.ts > 5 * 60 * 1000;
         const isLast = i === messages.length - 1;
 
-        // Show a centered day/time stamp at the top of a new time block.
-        const showStamp = m.ts - lastStampAt > 30 * 60 * 1000;
-        if (showStamp) lastStampAt = m.ts;
-        const { day, time } = dayLabel(m.ts);
+        // Like iMessage: a stamp at the start and after a gap of an hour+.
+        // The bold day word is only repeated when the calendar day changes.
+        const showStamp = m.ts - lastStampAt > 60 * 60 * 1000;
+        let stamp = null;
+        if (showStamp) {
+          const p = stampParts(m.ts);
+          stamp = { day: p.dayKey !== lastStampDay ? p.day : null, time: p.time };
+          lastStampAt = m.ts;
+          lastStampDay = p.dayKey;
+        }
 
         return (
           <div key={m.id}>
-            {showStamp && (
+            {stamp && (
               <div className="day-stamp">
-                <b>{day}</b> {time}
+                {stamp.day && <b>{stamp.day} </b>}
+                {stamp.time}
               </div>
             )}
             <MessageRow

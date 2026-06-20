@@ -26,7 +26,7 @@ export default function NavBar({ memberIds, onBack, onTitle, onAvatar }) {
         <button className="navbar-center" onClick={onTitle} aria-label="Group members">
           <span className="nav-avatars">
             {shown.map((id) => (
-              <img key={id} src={avatarFor(id)} alt="" />
+              <img key={id} src={avatarFor(id)} alt={id} loading="lazy" />
             ))}
           </span>
           <span className="navbar-title">JFCD</span>

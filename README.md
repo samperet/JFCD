@@ -1,248 +1,93 @@
-# JFCD - Secure Chat PWA
+# JFCD
 
-A modern, beautiful group chat application built like Apple Messages with offline support and push notifications.
+A secure, iOS-style group chat **PWA** built with **Next.js 14**. Four friends — Jaya, Fiona, Lucy & Cece — share one thread. Tap a name to join, chat in an authentic iMessage interface, and personalize your avatar.
+
+> Minimum-security demo: no accounts, no passwords, no server. Everything lives on the device.
 
 ## Features
 
-✨ **Apple Messages-style UI** - Clean, minimal design inspired by iOS Messages
-- Rounded message bubbles with blue for sent, gray for received
-- Smooth animations and transitions
-- Native iOS-like appearance
+- **iOS phone UI** — device frame with Dynamic Island, live status bar, and home indicator on desktop; full-bleed native feel on a real phone.
+- **iMessage thread** — grouped bubbles with tails, sender avatars, day/time separators, a "Delivered" receipt, and an animated typing indicator.
+- **Tap-to-login** — pick your name from an iOS contacts-style list.
+- **Switch user** — iOS bottom sheet with a checkmark on the active user and a notifications toggle.
+- **Avatar picker** — bottom sheet with 16 [DiceBear](https://dicebear.com) styles, live preview, and a Shuffle button.
+- **PWA** — installable, offline shell caching via service worker, web app manifest, and unread-message notifications.
+- **Light & dark mode** — follows the system color scheme.
+- **Accessible** — modal focus trap + Escape to close, live-region typing announcements, labeled controls, and AA-contrast text.
 
-👥 **User Management** - Hamburger menu for quick user switching
-- Switch between Jaya, Fiona, Lucy, and Cece instantly
-- Each user has unique emoji avatar
-- Current user shown at bottom
+## Tech stack
 
-💬 **Real-time Messaging** - One shared group chat thread
-- Smooth message animations
-- Auto-scrolling to latest messages
-- Message timestamps
+| | |
+|---|---|
+| Framework | Next.js 14 (App Router, client components) |
+| UI | React 18, hand-written iOS design system in CSS |
+| State | React Context + `localStorage` persistence |
+| Avatars | DiceBear HTTP API |
+| PWA | `app/manifest.js` metadata route + `public/sw.js` |
 
-🔔 **Push Notifications** - Get alerts for unread messages
-- Enable via hamburger menu
-- Shows sender and message preview
-- Unread count in browser tab and notification badge
-- Smart detection (only when app is in background)
-
-🎨 **Custom Avatars** - 16+ fun emoji to choose from
-- Change anytime via ✨ button
-- Avatars persist across sessions
-- Displayed next to user messages
-
-📱 **Progressive Web App** - Install as native app
-- Offline-first with service worker caching
-- Works on all devices and browsers
-- One-click installation
-
-🔒 **Secure** - All data stays local
-- IndexedDB for persistent storage
-- No server uploads or tracking
-- No external API calls
-
-## Architecture
-
-### Files
-
-| File | Purpose |
-|------|---------|
-| `index.html` | Apple Messages-style UI structure |
-| `styles.css` | Beautiful iOS-inspired design |
-| `app.js` | Core app logic, notifications, UI handling |
-| `service-worker.js` | Offline support, push notifications |
-| `manifest.json` | PWA configuration |
-| `vercel.json` | Vercel deployment config |
-
-### Technologies
-
-- **Vanilla JavaScript** - No frameworks (~20KB)
-- **IndexedDB** - Persistent local storage
-- **Service Worker** - Offline-first PWA + notifications
-- **Notifications API** - Browser push alerts
-- **CSS Grid & Flexbox** - Responsive layout
-- **Apple Design System** - System font stack, iOS conventions
-
-## How to Use
-
-### Local Development
+## Getting started
 
 ```bash
-# Start HTTP server
-python3 -m http.server 8000
-
-# Open in browser
-open http://localhost:8000
+npm install
+npm run dev      # http://localhost:3000
 ```
-
-### User Switching
-
-1. Tap the **☰ hamburger menu** (top left)
-2. Select a user (Jaya, Fiona, Lucy, Cece)
-3. Current user has a ✓ checkmark
-4. Instantly switch between users
-
-### Chat Features
-
-- **Send Messages** - Type and press Enter or tap send button
-- **Avatars** - Tap ✨ (top right) to change your emoji
-- **Notifications** - Click hamburger menu → "Enable Notifications"
-- **See Unread** - Badge shows count, tab title updates
-
-### Avatar Selection
-
-- Click ✨ button in top right
-- Choose from 16+ fun emojis
-- Changes persist automatically
-
-## UI Design
-
-The app uses Apple's Human Interface Guidelines:
-
-- **Color**: Blue (#007AFF) for primary actions and sent messages
-- **Typography**: System fonts (-apple-system, BlinkMacSystemFont)
-- **Spacing**: 8px base unit, 16px/24px paddings
-- **Corners**: 16-18px border radius for modern feel
-- **Shadows**: Subtle 1px shadows for depth
-- **Dark Mode**: Full support with inverted colors
-
-## Deployment to Vercel
-
-### 1. Push to GitHub
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/JFCD.git
-git push -u origin main
+npm run build    # production build
+npm start        # serve the production build
 ```
 
-### 2. Deploy to Vercel
-
-- Go to [vercel.com](https://vercel.com)
-- Click "Import" → Select your JFCD repo
-- Vercel auto-detects as static site
-- One-click deploy! 🚀
-- Live at: `https://jfcd-xxxxx.vercel.app`
-
-### 3. Custom Domain (Optional)
-
-- In Vercel dashboard → Settings → Domains
-- Add your custom domain
-- Update DNS records as shown
-
-**Note**: HTTPS (which Vercel provides) is required for notifications and PWA installation.
-
-## Browser Support
-
-| Browser | Version | Notes |
-|---------|---------|-------|
-| Chrome | 90+ | Full support |
-| Safari | 15+ | Full support |
-| Firefox | 88+ | Full support |
-| Edge | 90+ | Full support |
-| Mobile Safari | 15+ | Full PWA support |
-
-## Installation as PWA
-
-### On Desktop
-1. Open the app in Chrome/Edge
-2. Click "Install" in the address bar
-3. Choose "Install JFCD"
-4. Opens as standalone app on taskbar
-
-### On iOS
-1. Open in Safari
-2. Tap Share → Add to Home Screen
-3. Creates home screen icon
-4. Opens fullscreen
-
-### On Android
-1. Open in Chrome
-2. Tap menu (three dots) → Install app
-3. Home screen shortcut created
-4. Fullscreen app experience
-
-## Keyboard Shortcuts
-
-- `Enter` - Send message
-- `Escape` - Close menus/modals
-- `Tab` - Navigation
-
-## Security Features
-
-✅ Content Security Policy friendly (no inline scripts)  
-✅ No external dependencies  
-✅ No tracking or analytics  
-✅ No passwords needed (demo app)  
-✅ Local-first data storage  
-✅ HTTPS required for deployment  
-✅ Service Worker validation  
-
-## Performance
-
-- **App Size**: ~30KB (HTML + CSS + JS gzipped)
-- **Load Time**: <500ms on 3G
-- **Offline**: Instant cached load
-- **Memory**: <15MB typical usage
-- **Battery**: Optimized for mobile
-
-## Testing
-
-All core features tested:
-- [x] User login and switching
-- [x] Message sending/receiving
-- [x] Avatar selection and persistence
-- [x] Push notifications
-- [x] Hamburger menu
-- [x] Message timestamps
-- [x] Responsive design (mobile/desktop)
-- [x] Dark mode support
-- [x] Service worker offline
-- [x] Unread count badge
-
-## Future Enhancements
-
-- Multiple chat threads
-- Message search
-- Emoji reactions
-- Message reactions
-- User typing indicators
-- Voice messages
-- Photo sharing
-- Dark/light theme toggle
-- Message editing/deletion
-
-## File Structure
+## Project structure
 
 ```
-JFCD/
-├── index.html          # Apple Messages UI
-├── styles.css          # iOS-inspired design
-├── app.js              # Core application logic
-├── service-worker.js   # PWA + notifications
-├── manifest.json       # PWA config
-├── vercel.json         # Vercel deploy config
-├── package.json        # Project metadata
-├── .gitignore          # Git ignore rules
-└── README.md           # This file
+app/
+  layout.js          root layout, metadata, viewport, SW registration
+  page.js            mounts the store + phone frame
+  globals.css        the iOS design system
+  manifest.js        PWA manifest (metadata route)
+components/
+  PhoneFrame.js      device shell (island, status bar, home indicator)
+  StatusBar.js       live clock + signal/wifi/battery
+  App.js             login vs. chat router
+  LoginScreen.js     tap-a-name contacts list
+  ChatScreen.js      nav bar + thread + composer + sheets
+  NavBar.js          iOS nav bar with member avatars
+  MessageList.js     grouping, day stamps, auto-scroll
+  MessageRow.js      a single bubble (tails, avatar, receipt)
+  TypingRow.js       animated typing indicator
+  Composer.js        auto-growing input + send
+  Sheet.js           accessible iOS bottom sheet (focus trap, Escape)
+  SwitchUserSheet.js / AvatarSheet.js
+lib/
+  store.js           context, persistence, simulated replies, notifications
+  users.js           roster + DiceBear URL helper
+public/
+  sw.js              offline service worker
 ```
 
-## Development Notes
+## Data model
 
-- **No Build Tools**: Pure vanilla JS, no webpack/bundler
-- **No Dependencies**: Completely self-contained
-- **No Database**: IndexedDB for local storage
-- **No Server**: Static files only, works anywhere
-- **No Transpilation**: Modern JS features (ES6+)
+This is a **client-only** app. Messages, the chosen user, and per-user avatars are persisted in `localStorage`. Replies from other users are simulated locally to demonstrate the UI. There is no backend and nothing leaves the device.
 
-## Credits
+To make it a real multi-user chat (messages synced across devices), add Next.js API routes (or a service like Supabase/Firebase) behind `lib/store.js`.
 
-- Design inspired by **Apple Messages** and **iMessage**
-- Built with vanilla JavaScript for portability
-- Uses system fonts for authentic Apple feel
-- Icons and avatars are emoji for simplicity
+## Deploy to Vercel
+
+Vercel auto-detects Next.js — no config needed.
+
+1. Push to GitHub (already at `github.com/samperet/JFCD`).
+2. Import the repo at [vercel.com](https://vercel.com).
+3. Deploy. HTTPS (required for PWA install + notifications) is automatic.
+
+To rename the Vercel project: **Project → Settings → General → Project Name**.
+
+## Security notes
+
+- Patched Next.js **14.2.35** (addresses the Dec 2025 critical advisory).
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) set in `next.config.mjs`.
+- User message text is rendered as text (React escaping) — no `dangerouslySetInnerHTML`.
+- The service worker never caches cross-origin requests (DiceBear avatars go straight to network).
 
 ---
 
-**Version**: 2.0.0 (Apple Messages UI)  
-**Author**: Claude Code  
-**License**: MIT  
-**Status**: Ready for production ✨
+Version 3.0.0 · MIT
