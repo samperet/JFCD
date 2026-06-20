@@ -1,5 +1,12 @@
 # JFCD
 
+> ## ⚠️ This project has moved and is no longer maintained.
+> JFCD has been succeeded by **Colloqui** → **https://github.com/samperet/colloqui**
+>
+> All future development happens there. This repository is kept for history only.
+
+---
+
 A secure, iOS-style group chat **PWA** built with **Next.js 14**. Four friends — Jaya, Fiona, Lucy & Cece — share one thread. Tap a name to join, chat in an authentic iMessage interface, and personalize your avatar.
 
 > Minimum-security demo: no accounts, no passwords, no server. Everything lives on the device.
