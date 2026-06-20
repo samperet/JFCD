@@ -2,17 +2,34 @@
 const app = {
     currentUser: null,
     users: {
-        'Jaya': { avatar: '🎨', color: '#FF6B6B' },
-        'Fiona': { avatar: '🎭', color: '#4ECDC4' },
-        'Lucy': { avatar: '🌟', color: '#FFE66D' },
-        'Cece': { avatar: '🚀', color: '#95E1D3' }
+        'Jaya': {
+            avatar: 'https://api.dicebear.com/10.x/thumbs/svg?bodyProbability=100&seed=jaya_user',
+            emoji: '🎨',
+            color: '#FF6B6B'
+        },
+        'Fiona': {
+            avatar: 'https://api.dicebear.com/10.x/thumbs/svg?bodyProbability=100&seed=fiona_user',
+            emoji: '🎭',
+            color: '#4ECDC4'
+        },
+        'Lucy': {
+            avatar: 'https://api.dicebear.com/10.x/thumbs/svg?bodyProbability=100&seed=lucy_user',
+            emoji: '🌟',
+            color: '#FFE66D'
+        },
+        'Cece': {
+            avatar: 'https://api.dicebear.com/10.x/thumbs/svg?bodyProbability=100&seed=cece_user',
+            emoji: '🚀',
+            color: '#95E1D3'
+        }
     },
     messages: [],
     db: null,
     sw: null,
     notificationsEnabled: false,
     unreadCount: 0,
-    menuOpen: false
+    menuOpen: false,
+    avatarStyles: ['thumbs', 'avataaars', 'big-ears', 'big-smile', 'bottts', 'croodles', 'lorelei', 'micah', 'miniavs', 'notionists', 'personas', 'pixel-art', 'rings', 'shapes', 'thumbs', 'adventurer']
 };
 
 // DOM Elements
@@ -110,12 +127,23 @@ async function loadUserAvatars() {
         request.onsuccess = () => {
             request.result.forEach(userData => {
                 if (app.users[userData.name]) {
-                    app.users[userData.name].avatar = userData.avatar;
+                    app.users[userData.name].avatarStyle = userData.avatarStyle || 'thumbs';
+                    app.users[userData.name].avatarSeed = userData.avatarSeed || userData.name.toLowerCase();
+                    // Regenerate avatar URL with loaded style/seed
+                    app.users[userData.name].avatar = generateAvatarUrl(
+                        userData.avatarStyle || 'thumbs',
+                        userData.avatarSeed || userData.name.toLowerCase()
+                    );
                 }
             });
             resolve();
         };
     });
+}
+
+// Generate DiceBear avatar URL
+function generateAvatarUrl(style = 'thumbs', seed = 'default') {
+    return `https://api.dicebear.com/10.x/${style}/svg?bodyProbability=100&seed=${encodeURIComponent(seed)}`;
 }
 
 // Request notification permissions
@@ -203,15 +231,18 @@ async function renderMessages() {
         const messageGroup = document.createElement('div');
         messageGroup.className = 'message-group';
 
-        // Show avatar and name for first message or when sender changes
-        const showSenderInfo = msg.sender !== app.currentUser &&
-            (index === 0 || app.messages[index - 1].sender !== msg.sender);
-
+        // Show avatar for received messages
         if (msg.sender !== app.currentUser) {
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = app.users[msg.sender].avatar;
-            messageEl.appendChild(avatar);
+            const avatarContainer = document.createElement('div');
+            avatarContainer.className = 'message-avatar';
+
+            const avatarImg = document.createElement('img');
+            avatarImg.src = app.users[msg.sender].avatar;
+            avatarImg.alt = msg.sender;
+            avatarImg.className = 'avatar-image';
+
+            avatarContainer.appendChild(avatarImg);
+            messageEl.appendChild(avatarContainer);
         }
 
         const bubble = document.createElement('div');
@@ -303,7 +334,12 @@ function simulateOtherUserMessages() {
 async function loginUser(userName) {
     app.currentUser = userName;
     currentUserName.textContent = userName;
-    currentUserAvatar.textContent = app.users[userName].avatar;
+
+    // Update user avatar display
+    const avatarImg = currentUserAvatar.querySelector('img');
+    if (avatarImg) {
+        avatarImg.src = app.users[userName].avatar;
+    }
 
     sessionStorage.setItem('currentUser', userName);
 
@@ -381,9 +417,9 @@ function closeAvatarPicker() {
 }
 
 function updateAvatarSelection() {
-    const currentAvatar = app.users[app.currentUser].avatar;
+    const currentStyle = app.users[app.currentUser].avatarStyle || 'thumbs';
     avatarOptions.forEach(option => {
-        if (option.dataset.avatar === currentAvatar) {
+        if (option.dataset.avatar === currentStyle) {
             option.classList.add('selected');
         } else {
             option.classList.remove('selected');
@@ -391,12 +427,35 @@ function updateAvatarSelection() {
     });
 }
 
-async function changeAvatar(newAvatar) {
-    app.users[app.currentUser].avatar = newAvatar;
-    currentUserAvatar.textContent = newAvatar;
-    await saveUserAvatar(app.currentUser, newAvatar);
+async function changeAvatar(style) {
+    const user = app.currentUser;
+    const seed = user.toLowerCase() + '_' + Date.now();
+
+    app.users[user].avatarStyle = style;
+    app.users[user].avatarSeed = seed;
+    app.users[user].avatar = generateAvatarUrl(style, seed);
+
+    // Update UI
+    updateUserAvatarDisplay();
+
+    // Save to DB
+    const transaction = app.db.transaction(['users'], 'readwrite');
+    const store = transaction.objectStore('users');
+    store.put({
+        name: user,
+        avatarStyle: style,
+        avatarSeed: seed
+    });
+
     closeAvatarPicker();
     await renderMessages();
+}
+
+function updateUserAvatarDisplay() {
+    const imgEl = currentUserAvatar.querySelector('img');
+    if (imgEl) {
+        imgEl.src = app.users[app.currentUser].avatar;
+    }
 }
 
 // Notifications
@@ -473,6 +532,15 @@ avatarModal.addEventListener('click', (e) => {
 (async () => {
     await initDB();
     await loadUserAvatars();
+
+    // Initialize default avatar styles if not set
+    Object.keys(app.users).forEach(userName => {
+        if (!app.users[userName].avatarStyle) {
+            app.users[userName].avatarStyle = 'thumbs';
+            app.users[userName].avatarSeed = userName.toLowerCase();
+            app.users[userName].avatar = generateAvatarUrl('thumbs', userName.toLowerCase());
+        }
+    });
 
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
